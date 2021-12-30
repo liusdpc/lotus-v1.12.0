@@ -105,18 +105,18 @@ func (sw *schedWorker) handleWorker() {
 	defer sw.heartbeatTimer.Stop()
 
 	for {
-		{
-			sched.workersLk.Lock()
-			enabled := worker.enabled
-			sched.workersLk.Unlock()
-
-			// ask for more windows if we need them (non-blocking)
-			if enabled {
-				if !sw.requestWindows() {
-					return // graceful shutdown
-				}
-			}
-		}
+		//{
+		//	sched.workersLk.Lock()
+		//	enabled := worker.enabled
+		//	sched.workersLk.Unlock()
+		//
+		//	// ask for more windows if we need them (non-blocking)
+		//	if enabled {
+		//		if !sw.requestWindows() {
+		//			return // graceful shutdown
+		//		}
+		//	}
+		//}
 
 		// wait for more windows to come in, or for tasks to get finished (blocking)
 		for {
@@ -156,17 +156,17 @@ func (sw *schedWorker) handleWorker() {
 			}
 		}
 
-		// process assigned windows (non-blocking)
-		sched.workersLk.RLock()
-		worker.wndLk.Lock()
-
-		sw.workerCompactWindows()
-
-		// send tasks to the worker
-		sw.processAssignedWindows()
-
-		worker.wndLk.Unlock()
-		sched.workersLk.RUnlock()
+		//// process assigned windows (non-blocking)
+		//sched.workersLk.RLock()
+		//worker.wndLk.Lock()
+		//
+		//sw.workerCompactWindows()
+		//
+		//// send tasks to the worker
+		//sw.processAssignedWindows()
+		//
+		//worker.wndLk.Unlock()
+		//sched.workersLk.RUnlock()
 	}
 }
 
@@ -302,8 +302,8 @@ func (sw *schedWorker) workerCompactWindows() {
 
 				moved = append(moved, ti)
 				lower.todo = append(lower.todo, todo)
-				lower.allocated.add(worker.info.Resources, needRes)
-				window.allocated.free(worker.info.Resources, needRes)
+				lower.allocated.add(sw.sched.allowMyScheduler,todo.taskType, worker.info.Resources, needRes)
+				window.allocated.free(sw.sched.allowMyScheduler,todo.taskType, worker.info.Resources, needRes)
 			}
 
 			if len(moved) > 0 {
@@ -393,7 +393,7 @@ func (sw *schedWorker) startProcessingTask(taskDone chan struct{}, req *workerRe
 	needRes := ResourceTable[req.taskType][req.sector.ProofType]
 
 	w.lk.Lock()
-	w.preparing.add(w.info.Resources, needRes)
+	w.preparing.add(sh.allowMyScheduler, req.taskType, w.info.Resources, needRes)
 	w.lk.Unlock()
 
 	go func() {
@@ -403,7 +403,7 @@ func (sw *schedWorker) startProcessingTask(taskDone chan struct{}, req *workerRe
 
 		if err != nil {
 			w.lk.Lock()
-			w.preparing.free(w.info.Resources, needRes)
+			w.preparing.free(sh.allowMyScheduler,req.taskType, w.info.Resources, needRes)
 			w.lk.Unlock()
 			sh.workersLk.Unlock()
 
@@ -424,9 +424,9 @@ func (sw *schedWorker) startProcessingTask(taskDone chan struct{}, req *workerRe
 		}
 
 		// wait (if needed) for resources in the 'active' window
-		err = w.active.withResources(sw.wid, w.info, needRes, &sh.workersLk, func() error {
+		err = w.active.withResources(sh.allowMyScheduler, req.taskType, sw.wid, w.info, needRes, &sh.workersLk, func() error {
 			w.lk.Lock()
-			w.preparing.free(w.info.Resources, needRes)
+			w.preparing.free(sh.allowMyScheduler, req.taskType, w.info.Resources, needRes)
 			w.lk.Unlock()
 			sh.workersLk.Unlock()
 			defer sh.workersLk.Lock() // we MUST return locked from this function

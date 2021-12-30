@@ -128,6 +128,9 @@ var initCmd = &cli.Command{
 	Action: func(cctx *cli.Context) error {
 		log.Info("Initializing lotus miner")
 
+		os.Setenv("LOTUS_WINDOW_POST", "true")
+		os.Setenv("LOTUS_WINNING_POST", "true")
+
 		sectorSizeInt, err := units.RAMInBytes(cctx.String("sector-size"))
 		if err != nil {
 			return err
@@ -466,11 +469,14 @@ func storageMinerInit(ctx context.Context, cctx *cli.Context, api v1api.FullNode
 
 			smgr, err := sectorstorage.New(ctx, lstor, stor, lr, si, sectorstorage.SealerConfig{
 				ParallelFetchLimit: 10,
+				//PreCommit1Max:      7,
+				//DiskHoldMax:        0,
 				AllowAddPiece:      true,
 				AllowPreCommit1:    true,
 				AllowPreCommit2:    true,
 				AllowCommit:        true,
 				AllowUnseal:        true,
+				AllowMyScheduler:   true,
 			}, wsts, smsts)
 			if err != nil {
 				return err

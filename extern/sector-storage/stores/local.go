@@ -48,6 +48,36 @@ type LocalStorageMeta struct {
 	MaxStorage uint64
 }
 
+type MySchedulerMeta struct {
+	WorkerName         string
+	AddPieceMax        uint64
+	PreCommit1Max      uint64
+	PreCommit2Max      uint64
+	Commit2Max         uint64
+	DiskHoldMax        uint64
+	APDiskHoldMax      uint64
+	ForceP1FromLocalAP bool
+	ForceP2FromLocalP1 bool
+	ForceC2FromLocalP2 bool
+	IsPlanOffline      bool
+	AllowP2C2Parallel  bool
+	IgnoreOutOfSpace   bool
+	AutoPledgeDiff     uint64
+}
+
+type TestSchedulerMeta struct {
+	AddPieceMax        uint64
+	PreCommit1Max      uint64
+	PreCommit2Max      uint64
+	Commit2Max         uint64
+	ForceP1FromLocalAP bool
+	ForceP2FromLocalP1 bool
+	ForceC2FromLocalP2 bool
+	AllowP2C2Parallel  bool
+	FiLGuardKey        string
+	AllowDelay         uint64
+}
+
 // StorageConfig .lotusstorage/storage.json
 type StorageConfig struct {
 	StoragePaths []LocalPath
@@ -95,6 +125,17 @@ func (p *path) stat(ls LocalStorage) (fsutil.FsStat, error) {
 	}
 
 	stat.Reserved = p.reserved
+
+	mb, errIgnore := ioutil.ReadFile(filepath.Join(p.local, "myscheduler.json"))
+	if errIgnore == nil {
+		var meta MySchedulerMeta
+		if errIgnore := json.Unmarshal(mb, &meta); errIgnore == nil {
+			if meta.IgnoreOutOfSpace{
+				stat.Available = int64(^uint(0) >> 1)
+				return stat, err
+			}
+		}
+	}
 
 	for id, ft := range p.reservations {
 		for _, fileType := range storiface.PathTypes {
@@ -442,7 +483,8 @@ func (st *Local) AcquireSector(ctx context.Context, sid storage.SectorRef, exist
 			continue
 		}
 
-		si, err := st.index.StorageFindSector(ctx, sid.ID, fileType, ssize, false)
+		//si, err := st.index.StorageFindSector(ctx, sid.ID, fileType, ssize, false)
+		si, err := st.CheckDeclareSector(ctx, sid, fileType, ssize, pathType)
 		if err != nil {
 			log.Warnf("finding existing sector %d(t:%d) failed: %+v", sid, fileType, err)
 			continue
@@ -701,3 +743,27 @@ func (st *Local) FsStat(ctx context.Context, id ID) (fsutil.FsStat, error) {
 }
 
 var _ Store = &Local{}
+
+func (st *Local) CheckDeclareSector(ctx context.Context, sid storage.SectorRef, fileType storiface.SectorFileType, ssize abi.SectorSize, pathType storiface.PathType) ([]SectorStorageInfo, error) {
+	si0, err := st.index.StorageFindSector(ctx, sid.ID, fileType, ssize, false)
+	if len(si0) > 0 || err != nil {
+		return si0, err
+	}
+	if pathType == storiface.PathStorage {
+		for id, path := range st.paths {
+			if sstInfo, err := st.index.StorageInfo(ctx, id); err == nil {
+				if sstInfo.CanStore {
+					p := filepath.Join(path.local, fileType.String(), storiface.SectorName(sid.ID))
+					_, err := os.Stat(p)
+					if os.IsNotExist(err) || err != nil {
+						continue
+					}
+					if err := st.index.StorageDeclareSector(ctx, id, sid.ID, fileType, sstInfo.CanStore); err != nil {
+						continue
+					}
+				}
+			}
+		}
+	}
+	return st.index.StorageFindSector(ctx, sid.ID, fileType, ssize, false)
+}

@@ -5,6 +5,12 @@ import (
 	_ "net/http/pprof"
 	"os"
 
+	"encoding/json"
+	"github.com/filecoin-project/lotus/extern/sector-storage/stores"
+	"io/ioutil"
+	"path/filepath"
+	scServer "github.com/liusdpc/my-sector-counter/server"
+
 	"github.com/filecoin-project/lotus/api/v1api"
 
 	"github.com/filecoin-project/lotus/api/v0api"
@@ -31,6 +37,31 @@ var runCmd = &cli.Command{
 	Name:  "run",
 	Usage: "Start a lotus miner process",
 	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:  "window-post",
+			Usage: "enable window PoSt",
+			Value: true,
+		},
+		&cli.BoolFlag{
+			Name:  "winning-post",
+			Usage: "enable winning PoSt",
+			Value: true,
+		},
+		&cli.BoolFlag{
+			Name:  "p2p",
+			Usage: "enable P2P",
+			Value: true,
+		},
+		&cli.StringFlag{
+			Name:  "sctype",
+			Usage: "sector counter type(alloce,get)",
+			Value: "",
+		},
+		&cli.StringFlag{
+			Name:  "sclisten",
+			Usage: "host address and port the sector counter will listen on",
+			Value: "",
+		},
 		&cli.StringFlag{
 			Name:  "miner-api",
 			Usage: "2345",
@@ -51,6 +82,37 @@ var runCmd = &cli.Command{
 		},
 	},
 	Action: func(cctx *cli.Context) error {
+		if cctx.Bool("window-post") {
+			os.Setenv("LOTUS_WINDOW_POST", "true")
+		} else {
+			os.Unsetenv("LOTUS_WINDOW_POST")
+		}
+
+		if cctx.Bool("winning-post") {
+			os.Setenv("LOTUS_WINNING_POST", "true")
+		} else {
+			os.Unsetenv("LOTUS_WINNING_POST")
+		}
+
+		scType := cctx.String("sctype")
+		if scType == "alloce" || scType == "get" {
+			os.Setenv("SC_TYPE", scType)
+
+			scListen := cctx.String("sclisten")
+			if scListen == "" {
+				log.Errorf("sclisten must be set")
+				return nil
+			}
+			os.Setenv("SC_LISTEN", scListen)
+
+			if scType == "alloce" {
+				scFilePath := filepath.Join(cctx.String(FlagMinerRepo), "sectorid")
+				go scServer.Run(scFilePath)
+			}
+		} else {
+			os.Unsetenv("SC_TYPE")
+		}
+
 		if !cctx.Bool("enable-gpu-proving") {
 			err := os.Setenv("BELLMAN_NO_GPU", "true")
 			if err != nil {
@@ -119,6 +181,67 @@ var runCmd = &cli.Command{
 			return xerrors.Errorf("repo at '%s' is not initialized, run 'lotus-miner init' to set it up", minerRepoPath)
 		}
 
+		hostname, err := os.Hostname()
+		if err != nil {
+			hostname = ""
+		}
+		fileDst := filepath.Join(minerRepoPath, "myscheduler.json")
+		_, errorFile := os.Stat(fileDst)
+		if os.IsNotExist(errorFile) {
+			//persisting myScheduler metadata start//
+			b, err := json.MarshalIndent(&stores.MySchedulerMeta{
+				WorkerName:         hostname,
+				AddPieceMax:        uint64(0),
+				PreCommit1Max:      uint64(0),
+				PreCommit2Max:      uint64(0),
+				Commit2Max:         uint64(0),
+				DiskHoldMax:        uint64(0),
+				APDiskHoldMax:      uint64(0),
+				ForceP1FromLocalAP: true,
+				ForceP2FromLocalP1: true,
+				ForceC2FromLocalP2: false,
+				IsPlanOffline:      false,
+				AllowP2C2Parallel:  false,
+				AutoPledgeDiff:     uint64(0),
+			}, "", "  ")
+			if err != nil {
+				//return xerrors.Errorf("marshaling myScheduler config: %w", err)
+				log.Error("marshaling myScheduler config:", err)
+			}
+			if err := ioutil.WriteFile(filepath.Join(minerRepoPath, "myscheduler.json"), b, 0644); err != nil {
+				//return xerrors.Errorf("persisting myScheduler metadata (%s): %w", filepath.Join(minerRepoPath, "myscheduler.json"), err)
+				log.Error("persisting myScheduler metadata:", err)
+			}
+			//persisting myScheduler metadata end//
+		}
+
+		fileDst = filepath.Join(minerRepoPath, "externalWorker.json")
+		_, errorFile = os.Stat(fileDst)
+		if os.IsNotExist(errorFile) {
+			//persisting TestSchedulerMeta metadata start//
+			b, err := json.MarshalIndent(&stores.TestSchedulerMeta{
+				AddPieceMax:        uint64(1),
+				PreCommit1Max:      uint64(1),
+				PreCommit2Max:      uint64(1),
+				Commit2Max:         uint64(1),
+				ForceP1FromLocalAP: true,
+				ForceP2FromLocalP1: true,
+				ForceC2FromLocalP2: false,
+				AllowP2C2Parallel:  true,
+				FiLGuardKey:        "",
+				AllowDelay:         uint64(3),
+			}, "", "  ")
+			if err != nil {
+				//return xerrors.Errorf("marshaling TestSchedulerMeta config: %w", err)
+				log.Error("marshaling externalWorker config:", err)
+			}
+			if err := ioutil.WriteFile(filepath.Join(minerRepoPath, "externalWorker.json"), b, 0644); err != nil {
+				//return xerrors.Errorf("persisting testOpenSource metadata (%s): %w", filepath.Join(minerRepoPath, "externalWorker.json"), err)
+				log.Error("persisting externalWorker metadata:", err)
+			}
+			//persisting TestSchedulerMeta metadata end//
+		}
+
 		lr, err := r.Lock(repo.StorageMiner)
 		if err != nil {
 			return err
@@ -163,7 +286,7 @@ var runCmd = &cli.Command{
 			return xerrors.Errorf("getting API endpoint: %w", err)
 		}
 
-		if bootstrapLibP2P {
+		if bootstrapLibP2P || cctx.Bool("p2p") {
 			log.Infof("Bootstrapping libp2p network with full node")
 
 			// Bootstrap with full node
@@ -175,6 +298,8 @@ var runCmd = &cli.Command{
 			if err := minerapi.NetConnect(ctx, remoteAddrs); err != nil {
 				return xerrors.Errorf("connecting to full node (libp2p): %w", err)
 			}
+		} else {
+			log.Warn("Thie miner will be disabled p2p")
 		}
 
 		log.Infof("Remote version %s", v)

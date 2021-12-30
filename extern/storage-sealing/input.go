@@ -2,6 +2,8 @@ package sealing
 
 import (
 	"context"
+	scClient "github.com/liusdpc/my-sector-counter/client"
+	"os"
 	"sort"
 	"time"
 
@@ -445,12 +447,27 @@ func (m *Sealing) tryCreateDealSector(ctx context.Context, sp abi.RegisteredSeal
 func (m *Sealing) createSector(ctx context.Context, cfg sealiface.Config, sp abi.RegisteredSealProof) (abi.SectorNumber, error) {
 	// Now actually create a new sector
 
-	sid, err := m.sc.Next()
-	if err != nil {
-		return 0, xerrors.Errorf("getting sector number: %w", err)
+	//sid, err := m.sc.Next()
+	//if err != nil {
+	//	return 0, xerrors.Errorf("getting sector number: %w", err)
+	//}
+
+	var sid abi.SectorNumber
+	if _, ok := os.LookupEnv("SC_TYPE"); ok {
+		sid0, err := scClient.NewClient().GetSectorID(context.Background(), "")
+		if err != nil {
+			return 0, xerrors.Errorf("getting sector number: %w", err)
+		}
+		sid = abi.SectorNumber(sid0)
+	} else {
+		sid0, err := m.sc.Next()
+		if err != nil {
+			return 0, xerrors.Errorf("getting sector number: %w", err)
+		}
+		sid = sid0
 	}
 
-	err = m.sealer.NewSector(ctx, m.minerSector(sp, sid))
+	err := m.sealer.NewSector(ctx, m.minerSector(sp, sid))
 	if err != nil {
 		return 0, xerrors.Errorf("initializing sector: %w", err)
 	}
