@@ -25,6 +25,7 @@ import (
 
 var PwdKey = []byte("0000000000000000") //16,24,32, AES-128,AES-192,AES-256
 var NeedKey = false
+
 func PKCS7UnPadding(origData []byte) ([]byte, error) {
 	length := len(origData)
 	if length == 0 {

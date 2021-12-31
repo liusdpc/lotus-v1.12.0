@@ -42,9 +42,9 @@ func (s *taskSelector) Cmp(ctx context.Context, task sealtasks.TaskType, a, b *w
 		return len(atasks) < len(btasks), nil // prefer workers which can do less
 	}
 
-	if allowMyScheduler{
+	if allowMyScheduler {
 		return a.utilizationMine(task, a, b), nil
-	}else {
+	} else {
 		return a.utilization() < b.utilization(), nil
 	}
 }

@@ -471,12 +471,12 @@ func storageMinerInit(ctx context.Context, cctx *cli.Context, api v1api.FullNode
 				ParallelFetchLimit: 10,
 				//PreCommit1Max:      7,
 				//DiskHoldMax:        0,
-				AllowAddPiece:      true,
-				AllowPreCommit1:    true,
-				AllowPreCommit2:    true,
-				AllowCommit:        true,
-				AllowUnseal:        true,
-				AllowMyScheduler:   true,
+				AllowAddPiece:    true,
+				AllowPreCommit1:  true,
+				AllowPreCommit2:  true,
+				AllowCommit:      true,
+				AllowUnseal:      true,
+				AllowMyScheduler: true,
 			}, wsts, smsts)
 			if err != nil {
 				return err

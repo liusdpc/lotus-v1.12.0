@@ -67,9 +67,9 @@ func (s *existingSelector) Ok(ctx context.Context, task sealtasks.TaskType, spt 
 }
 
 func (s *existingSelector) Cmp(ctx context.Context, task sealtasks.TaskType, a, b *workerHandle, allowMyScheduler bool) (bool, error) {
-	if allowMyScheduler{
+	if allowMyScheduler {
 		return a.utilizationMine(task, a, b), nil
-	}else {
+	} else {
 		return a.utilization() < b.utilization(), nil
 	}
 }

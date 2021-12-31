@@ -95,7 +95,24 @@ Response:
     "MemSwap": 42,
     "MemReserved": 42,
     "CPUs": 42,
-    "GPUs": null
+    "GPUs": null,
+    "IsMiner": true,
+    "AddPieceMax": 42,
+    "PreCommit1Max": 42,
+    "DiskHoldMax": 42,
+    "DiskUsed": 42,
+    "APDiskHoldMax": 42,
+    "APDiskUsed": 42,
+    "PreCommit2Max": 42,
+    "Commit2Max": 42,
+    "AllowMyScheduler": true,
+    "ForceP1FromLocalAP": true,
+    "ForceP2FromLocalP1": true,
+    "ForceC2FromLocalP2": true,
+    "IsPlanOffline": true,
+    "AllowP2C2Parallel": true,
+    "AutoPledgeDiff": 42,
+    "IgnoreOutOfSpace": true
   }
 }
 ```
@@ -167,7 +184,8 @@ Inputs:
   },
   null,
   1024,
-  {}
+  {},
+  true
 ]
 ```
 

@@ -2437,14 +2437,33 @@ Response:
         "CPUs": 64,
         "GPUs": [
           "aGPU 1337"
-        ]
+        ],
+        "IsMiner": false,
+        "AddPieceMax": 0,
+        "PreCommit1Max": 0,
+        "DiskHoldMax": 0,
+        "DiskUsed": 0,
+        "APDiskHoldMax": 0,
+        "APDiskUsed": 0,
+        "PreCommit2Max": 0,
+        "Commit2Max": 0,
+        "AllowMyScheduler": false,
+        "ForceP1FromLocalAP": false,
+        "ForceP2FromLocalP1": false,
+        "ForceC2FromLocalP2": false,
+        "IsPlanOffline": false,
+        "AllowP2C2Parallel": false,
+        "AutoPledgeDiff": 0,
+        "IgnoreOutOfSpace": false
       }
     },
     "Enabled": true,
     "MemUsedMin": 0,
     "MemUsedMax": 0,
     "GpuUsed": false,
-    "CpuUse": 0
+    "CpuUse": 0,
+    "TaskTypes": "",
+    "Tasks": ""
   }
 }
 ```

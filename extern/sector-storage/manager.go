@@ -104,11 +104,11 @@ type SealerConfig struct {
 	//PreCommit1Max      uint64
 	//DiskHoldMax        uint64
 	// Local worker config
-	AllowAddPiece   bool
-	AllowPreCommit1 bool
-	AllowPreCommit2 bool
-	AllowCommit     bool
-	AllowUnseal     bool
+	AllowAddPiece    bool
+	AllowPreCommit1  bool
+	AllowPreCommit2  bool
+	AllowCommit      bool
+	AllowUnseal      bool
 	AllowMyScheduler bool
 
 	// ResourceFiltering instructs the system which resource filtering strategy
@@ -265,7 +265,7 @@ func (m *Manager) SectorsUnsealPiece(ctx context.Context, sector storage.SectorR
 	selector := newExistingSelector(m.index, sector.ID, storiface.FTSealed|storiface.FTCache, true)
 
 	log.Debugf("will schedule unseal for sector %d", sector.ID)
-	err = m.sched.Schedule(ctx, m.index,sector, sealtasks.TTUnseal, selector, sealFetch, func(ctx context.Context, w Worker) error {
+	err = m.sched.Schedule(ctx, m.index, sector, sealtasks.TTUnseal, selector, sealFetch, func(ctx context.Context, w Worker) error {
 		// TODO: make restartable
 
 		// NOTE: we're unsealing the whole sector here as with SDR we can't really

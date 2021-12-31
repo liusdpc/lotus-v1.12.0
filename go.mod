@@ -40,7 +40,7 @@ require (
 	github.com/filecoin-project/go-jsonrpc v0.1.4-0.20210217175800-45ea43ac2bec
 	github.com/filecoin-project/go-padreader v0.0.0-20210723183308-812a16dc01b1
 	github.com/filecoin-project/go-paramfetch v0.0.2-0.20210614165157-25a6c7769498
-	github.com/filecoin-project/go-state-types v0.1.1-0.20210915140513-d354ccf10379
+	github.com/filecoin-project/go-state-types v0.1.1
 	github.com/filecoin-project/go-statemachine v1.0.1
 	github.com/filecoin-project/go-statestore v0.1.1
 	github.com/filecoin-project/go-storedcounter v0.0.0-20200421200003-1c99c62e8a5b
@@ -120,6 +120,7 @@ require (
 	github.com/libp2p/go-libp2p-tls v0.1.3
 	github.com/libp2p/go-libp2p-yamux v0.5.4
 	github.com/libp2p/go-maddr-filter v0.1.0
+	github.com/liusdpc/my-sector-counter v0.0.0-20211230084309-18eaea0b6cf5 // indirect
 	github.com/mattn/go-isatty v0.0.13
 	github.com/minio/blake2b-simd v0.0.0-20160723061019-3f5f724cb5b1
 	github.com/mitchellh/go-homedir v1.1.0

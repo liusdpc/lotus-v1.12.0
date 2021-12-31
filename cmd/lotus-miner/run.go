@@ -7,9 +7,9 @@ import (
 
 	"encoding/json"
 	"github.com/filecoin-project/lotus/extern/sector-storage/stores"
+	scServer "github.com/liusdpc/my-sector-counter/server"
 	"io/ioutil"
 	"path/filepath"
-	scServer "github.com/liusdpc/my-sector-counter/server"
 
 	"github.com/filecoin-project/lotus/api/v1api"
 

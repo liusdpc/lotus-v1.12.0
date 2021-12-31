@@ -117,7 +117,7 @@ var sectorsMyPledgeOnceCmd = &cli.Command{
 				uAddPieceMax = uAddPieceMax + 1
 			}
 		}
-		for i:=uint64(0);i < uAddPieceMax;i++ {
+		for i := uint64(0); i < uAddPieceMax; i++ {
 			id, err := nodeApi.PledgeSector(ctx)
 			if err != nil {
 				return err
@@ -161,7 +161,7 @@ var sectorsMyPledgeCmd = &cli.Command{
 		for _, stat := range st {
 			uAddPieceMax = uAddPieceMax + stat.Info.Resources.AddPieceMax
 		}
-		for i:=uint64(0);i < uAddPieceMax;i++ {
+		for i := uint64(0); i < uAddPieceMax; i++ {
 			id, err := nodeApi.PledgeSector(ctx)
 			if err != nil {
 				return err

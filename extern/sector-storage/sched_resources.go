@@ -1,8 +1,8 @@
 package sectorstorage
 
 import (
-	"sync"
 	"github.com/filecoin-project/lotus/extern/sector-storage/storiface"
+	"sync"
 
 	"context"
 	"encoding/hex"
@@ -17,7 +17,8 @@ import (
 )
 
 var WorkerRpcTimeout = 10 * time.Second
-func (a *activeResources) withResourcesMeNoLocker(index stores.SectorIndex, allowMyScheduler bool, sector abi.SectorID,taskType sealtasks.TaskType,worker *workerHandle,
+
+func (a *activeResources) withResourcesMeNoLocker(index stores.SectorIndex, allowMyScheduler bool, sector abi.SectorID, taskType sealtasks.TaskType, worker *workerHandle,
 	id WorkerID, wr storiface.WorkerResources, r Resources, cb func() error) error {
 	a.add(allowMyScheduler, taskType, wr, r)
 
@@ -31,7 +32,7 @@ func (a *activeResources) withResourcesMeNoLocker(index stores.SectorIndex, allo
 	return err
 }
 
-func (a *activeResources) withResourcesMe(index stores.SectorIndex, allowMyScheduler bool, sector abi.SectorID,taskType sealtasks.TaskType,worker *workerHandle,
+func (a *activeResources) withResourcesMe(index stores.SectorIndex, allowMyScheduler bool, sector abi.SectorID, taskType sealtasks.TaskType, worker *workerHandle,
 	id WorkerID, wr storiface.WorkerResources, r Resources, locker sync.Locker, cb func() error) error {
 	//info, errInfo := worker.workerRpc.Info(context.TODO())
 	//if errInfo != nil {
@@ -39,7 +40,7 @@ func (a *activeResources) withResourcesMe(index stores.SectorIndex, allowMySched
 	//}
 
 	for !a.canHandleRequestMine(index, sector, taskType, worker, id, "withResources") {
-		log.Debugf("withResourcesMe didn't find any good withResources on worker %s@%s for sector s-t0%d-%d taskType %s",hex.EncodeToString(id[:]), worker.info.Hostname, sector.Miner, sector.Number, taskType)
+		log.Debugf("withResourcesMe didn't find any good withResources on worker %s@%s for sector s-t0%d-%d taskType %s", hex.EncodeToString(id[:]), worker.info.Hostname, sector.Miner, sector.Number, taskType)
 		if a.cond == nil {
 			a.cond = sync.NewCond(locker)
 		}
@@ -166,7 +167,7 @@ func (a *activeResources) canHandleRequest(needRes Resources, wid WorkerID, call
 	return true
 }
 
-func (a *activeResources) canHandleRequestMine(index stores.SectorIndex, sector abi.SectorID,taskType sealtasks.TaskType,worker *workerHandle, wid2 WorkerID, caller string) bool {
+func (a *activeResources) canHandleRequestMine(index stores.SectorIndex, sector abi.SectorID, taskType sealtasks.TaskType, worker *workerHandle, wid2 WorkerID, caller string) bool {
 	//func (a *activeResources) canHandleRequestMine(index stores.SectorIndex, sector abi.SectorID,taskType sealtasks.TaskType,worker *workerHandle, wid2 WorkerID, caller string, info storiface.WorkerInfo) bool {
 	wid := hex.EncodeToString(wid2[:]) //hex.EncodeToString(wid2[5:])
 	if worker == nil || worker.workerRpc == nil {
@@ -210,8 +211,8 @@ func (a *activeResources) canHandleRequestMine(index stores.SectorIndex, sector 
 	//if apMax == 0 {
 	//	apMax = 5
 	//}
-	if apMax == 0 && p1Max == 0 && p2Max ==0 && c2Max ==0 && diskHoldMax ==0 && apDiskHoldMax ==0 &&
-		isPlanOffline == false	&& forceP1FromLocalAP == false && forceP2FromLocalP1 == false &&
+	if apMax == 0 && p1Max == 0 && p2Max == 0 && c2Max == 0 && diskHoldMax == 0 && apDiskHoldMax == 0 &&
+		isPlanOffline == false && forceP1FromLocalAP == false && forceP2FromLocalP1 == false &&
 		forceC2FromLocalP2 == false && allowP2C2Parallel == false {
 		minerPath, ok := os.LookupEnv("LOTUS_MINER_PATH")
 		if ok {
@@ -266,7 +267,7 @@ func (a *activeResources) canHandleRequestMine(index stores.SectorIndex, sector 
 			return false
 		}
 
-		if (forceP1FromLocalAP == true) {
+		if forceP1FromLocalAP == true {
 			var apLocal = a.localCacheExist(index, sector, worker, storiface.FTUnsealed)
 			if apLocal == false {
 				log.Debugf("sector s-t0%d-%d sched: not scheduling on worker %s@%s for %s from %s; It only receives AP from the local.", sector.Miner, sector.Number, wid, info.Hostname, taskType, caller)
@@ -290,7 +291,7 @@ func (a *activeResources) canHandleRequestMine(index stores.SectorIndex, sector 
 			log.Debugf("sector s-t0%d-%d sched: not scheduling on worker %s@%s for %s from %s; not enough PreCommit2 quota, 1 need, %d in use, PreCommit2Max is %d", sector.Miner, sector.Number, wid, info.Hostname, taskType, caller, a.preCommit2Used, p2Max)
 			return false
 		}
-		if (forceP2FromLocalP1 == true) {
+		if forceP2FromLocalP1 == true {
 			var p1Local = a.localCacheExist(index, sector, worker, storiface.FTCache)
 			if p1Local == false {
 				log.Debugf("sector s-t0%d-%d sched: not scheduling on worker %s@%s for %s from %s; It only receives P1 from the local.", sector.Miner, sector.Number, wid, info.Hostname, taskType, caller)
@@ -329,7 +330,7 @@ func (a *activeResources) canHandleRequestMine(index stores.SectorIndex, sector 
 			log.Debugf("sector s-t0%d-%d sched: not scheduling on worker %s@%s for %s from %s; not enough Commit2 quota, 1 need, %d in use, Commit2Max is %d", sector.Miner, sector.Number, wid, info.Hostname, taskType, caller, a.commit2Used, c2Max)
 			return false
 		}
-		if (forceC2FromLocalP2 == true) {
+		if forceC2FromLocalP2 == true {
 			var apLocal = a.localCacheExist(index, sector, worker, storiface.FTCache)
 			if apLocal == false {
 				log.Debugf("sector s-t0%d-%d sched: not scheduling on worker %s@%s for %s from %s; It only receives P2 from the local.", sector.Miner, sector.Number, wid, info.Hostname, taskType, caller)
@@ -373,7 +374,7 @@ func (a *activeResources) canHandleRequestMine(index stores.SectorIndex, sector 
 	return true
 }
 
-func (a *activeResources) localCacheCount(index stores.SectorIndex,sector abi.SectorID,worker *workerHandle) uint64 {
+func (a *activeResources) localCacheCount(index stores.SectorIndex, sector abi.SectorID, worker *workerHandle) uint64 {
 	var cacheCount = uint64(0)
 	var out []stores.StoragePath
 	//out, err := worker.workerRpc.Paths(context.TODO())
@@ -394,7 +395,7 @@ func (a *activeResources) localCacheCount(index stores.SectorIndex,sector abi.Se
 			continue
 		}
 		for _, info := range unsealed {
-			if path.ID == info.ID{
+			if path.ID == info.ID {
 				cacheCount++
 			}
 		}
@@ -405,7 +406,7 @@ func (a *activeResources) localCacheCount(index stores.SectorIndex,sector abi.Se
 			continue
 		}
 		for _, info := range sealed {
-			if path.ID == info.ID{
+			if path.ID == info.ID {
 				cacheCount++
 			}
 		}
@@ -416,14 +417,14 @@ func (a *activeResources) localCacheCount(index stores.SectorIndex,sector abi.Se
 			continue
 		}
 		for _, info := range cached {
-			if path.ID == info.ID{
+			if path.ID == info.ID {
 				cacheCount = cacheCount + 14
 			}
 		}
 	}
 	return cacheCount
 }
-func (a *activeResources) localCacheExist(index stores.SectorIndex,sector abi.SectorID,worker *workerHandle, fileType storiface.SectorFileType) bool {
+func (a *activeResources) localCacheExist(index stores.SectorIndex, sector abi.SectorID, worker *workerHandle, fileType storiface.SectorFileType) bool {
 	var localExist = false
 	var out []stores.StoragePath
 	//out, err := worker.workerRpc.Paths(context.TODO())
@@ -494,19 +495,19 @@ func (wh *workerHandle) utilizationMine(taskType sealtasks.TaskType, a, b *worke
 	if taskType == sealtasks.TTFinalize {
 
 	} else if taskType == sealtasks.TTCommit2 {
-		better = (a.preparing.commit2Used + a.active.commit2Used) < ( b.preparing.commit2Used + b.active.commit2Used )
+		better = (a.preparing.commit2Used + a.active.commit2Used) < (b.preparing.commit2Used + b.active.commit2Used)
 	} else if taskType == sealtasks.TTCommit1 {
-		better = (a.preparing.commit2Used + a.active.commit2Used) < ( b.preparing.commit2Used + b.active.commit2Used )
+		better = (a.preparing.commit2Used + a.active.commit2Used) < (b.preparing.commit2Used + b.active.commit2Used)
 		//if (a.preparing.commit2Used + a.active.commit2Used) > 0{
 		//	better = false
 		//}
 	} else if taskType == sealtasks.TTPreCommit2 {
-		better = (a.preparing.preCommit2Used + a.active.preCommit2Used) < ( b.preparing.preCommit2Used + b.active.preCommit2Used)
+		better = (a.preparing.preCommit2Used + a.active.preCommit2Used) < (b.preparing.preCommit2Used + b.active.preCommit2Used)
 		//if (a.preparing.commit2Used + a.active.commit2Used) > 0{
 		//	better = false
 		//}
 	} else if taskType == sealtasks.TTPreCommit1 {
-		better = (a.preparing.preCommit1Used + a.active.preCommit1Used) < ( b.preparing.preCommit1Used + b.active.preCommit1Used)
+		better = (a.preparing.preCommit1Used + a.active.preCommit1Used) < (b.preparing.preCommit1Used + b.active.preCommit1Used)
 	} else if taskType == sealtasks.TTAddPiece {
 		//better = (a.preparing.preCommit1Used + a.active.preCommit1Used + a.preparing.apUsed + a.active.apUsed) < ( b.preparing.preCommit1Used + b.active.preCommit1Used + b.preparing.apUsed + b.active.apUsed)
 		var betterDefault = (a.preparing.apUsed + a.active.apUsed) < (b.preparing.apUsed + b.active.apUsed)

@@ -448,8 +448,8 @@ var runCmd = &cli.Command{
 
 		workerApi := &worker{
 			LocalWorker: sectorstorage.NewLocalWorker(sectorstorage.WorkerConfig{
-				TaskTypes: taskTypes,
-				NoSwap:    cctx.Bool("no-swap"),
+				TaskTypes:          taskTypes,
+				NoSwap:             cctx.Bool("no-swap"),
 				PreCommit1Max:      preCommit1Max,
 				PreCommit2Max:      preCommit2Max,
 				Commit2Max:         commit2Max,

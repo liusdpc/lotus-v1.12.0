@@ -37,17 +37,17 @@ var (
 
 func getPriorityByTask(taskType sealtasks.TaskType) int {
 	var priority = 0
-	if taskType == sealtasks.TTFinalize{
+	if taskType == sealtasks.TTFinalize {
 		priority = 900
-	}else if taskType == sealtasks.TTCommit2{
+	} else if taskType == sealtasks.TTCommit2 {
 		priority = 800
-	}else if taskType == sealtasks.TTCommit1{
+	} else if taskType == sealtasks.TTCommit1 {
 		priority = 700
-	}else if taskType == sealtasks.TTPreCommit2{
+	} else if taskType == sealtasks.TTPreCommit2 {
 		priority = 600
-	}else if taskType == sealtasks.TTPreCommit1{
+	} else if taskType == sealtasks.TTPreCommit1 {
 		priority = 500
-	}else if taskType == sealtasks.TTAddPiece{
+	} else if taskType == sealtasks.TTAddPiece {
 		priority = 400
 	}
 
@@ -156,7 +156,7 @@ type activeResources struct {
 }
 
 type workerRequest struct {
-	ix stores.SectorIndex
+	ix       stores.SectorIndex
 	sector   storage.SectorRef
 	taskType sealtasks.TaskType
 	priority int // larger values more important
@@ -205,7 +205,7 @@ func newScheduler(allowMyScheduler bool) *scheduler {
 	}
 }
 
-func (sh *scheduler) Schedule(ctx context.Context, index stores.SectorIndex ,sector storage.SectorRef, taskType sealtasks.TaskType, sel WorkerSelector, prepare WorkerAction, work WorkerAction) error {
+func (sh *scheduler) Schedule(ctx context.Context, index stores.SectorIndex, sector storage.SectorRef, taskType sealtasks.TaskType, sel WorkerSelector, prepare WorkerAction, work WorkerAction) error {
 	ret := make(chan workerResponse)
 
 	select {
@@ -303,7 +303,7 @@ func (sh *scheduler) runAutoPledge() {
 			if apUsed >= apMax {
 				return
 			}
-			if p1Max - p1Used > apMax - apUsed {
+			if p1Max-p1Used > apMax-apUsed {
 				log.Infof(" lotus-miner sectors pledge automatic delivery")
 				//exe, err := os.Executable()
 				//if err != nil {
@@ -436,7 +436,6 @@ func (sh *scheduler) diag() SchedDiagInfo {
 	return out
 }
 
-
 func (sh *scheduler) trySchedMine() {
 	var allowDelay = uint64(0)
 	minerPath, ok := os.LookupEnv("LOTUS_MINER_PATH")
@@ -449,7 +448,7 @@ func (sh *scheduler) trySchedMine() {
 			}
 		}
 	}
-	if allowDelay >0 {
+	if allowDelay > 0 {
 		log.Debugf("trySchedMine SCHED delay %d seconds", allowDelay)
 		time.Sleep(time.Duration(allowDelay) * time.Second)
 	}
@@ -492,7 +491,7 @@ func (sh *scheduler) trySchedMine() {
 			if !ok {
 				continue
 			}
-			if !worker.preparing.canHandleRequestMine(task.ix, task.sector.ID, task.taskType, worker, wid,"schedAcceptable") {
+			if !worker.preparing.canHandleRequestMine(task.ix, task.sector.ID, task.taskType, worker, wid, "schedAcceptable") {
 				continue
 			}
 			tried++
@@ -521,7 +520,7 @@ func (sh *scheduler) trySchedMine() {
 			log.Infof("trySchedMine has successfully scheduled for sector s-t0%d-%d taskType %s to worker %s", task.sector.ID.Miner, task.sector.ID.Number, task.taskType, widstring)
 		}
 		if tried == 0 {
-			log.Debugf("trySchedMine didn't find any good workers for sector s-t0%d-%d taskType %s",task.sector.ID.Miner,task.sector.ID.Number,task.taskType)
+			log.Debugf("trySchedMine didn't find any good workers for sector s-t0%d-%d taskType %s", task.sector.ID.Miner, task.sector.ID.Number, task.taskType)
 		}
 
 	}
@@ -533,7 +532,7 @@ func (sh *scheduler) assignWorkerNoLocker(taskDone chan struct{}, wid WorkerID, 
 	needRes := ResourceTable[req.taskType][req.sector.ProofType]
 
 	w.lk.Lock()
-	w.preparing.add(sh.allowMyScheduler,req.taskType, w.info.Resources, needRes)
+	w.preparing.add(sh.allowMyScheduler, req.taskType, w.info.Resources, needRes)
 	w.lk.Unlock()
 
 	go func() {
@@ -610,7 +609,7 @@ func (sh *scheduler) assignWorker(taskDone chan struct{}, wid WorkerID, w *worke
 	needRes := ResourceTable[req.taskType][req.sector.ProofType]
 
 	w.lk.Lock()
-	w.preparing.add(sh.allowMyScheduler,req.taskType, w.info.Resources, needRes)
+	w.preparing.add(sh.allowMyScheduler, req.taskType, w.info.Resources, needRes)
 	w.lk.Unlock()
 
 	go func() {

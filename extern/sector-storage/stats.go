@@ -101,7 +101,7 @@ func (m *Manager) WorkerStats() map[uuid.UUID]storiface.WorkerStats {
 		//	c2Max = 1
 		//}
 		//isExternal = false
-		if apMax == 0 && p1Max == 0 && p2Max ==0 && c2Max ==0 && info.Resources.DiskHoldMax ==0 && info.Resources.APDiskHoldMax ==0 &&
+		if apMax == 0 && p1Max == 0 && p2Max == 0 && c2Max == 0 && info.Resources.DiskHoldMax == 0 && info.Resources.APDiskHoldMax == 0 &&
 			isPlanOffline == false && info.Resources.ForceP1FromLocalAP == false && info.Resources.ForceP2FromLocalP1 == false &&
 			info.Resources.ForceC2FromLocalP2 == false && info.Resources.AllowP2C2Parallel == false {
 			apMax = apMaxDefault
@@ -118,10 +118,10 @@ func (m *Manager) WorkerStats() map[uuid.UUID]storiface.WorkerStats {
 					if c2Max > (handle.active.commit2Used + handle.preparing.commit2Used) {
 						c2Tasks = fmt.Sprintf(" %d C2 ", c2Max-(handle.active.commit2Used+handle.preparing.commit2Used))
 					}
-					if  (handle.active.commit2Used) > 0{
+					if (handle.active.commit2Used) > 0 {
 						c2Running = fmt.Sprintf(" %d C2 ", (handle.active.commit2Used))
 					}
-					if  (handle.preparing.commit2Used) > 0{
+					if (handle.preparing.commit2Used) > 0 {
 						c2Preparing = fmt.Sprintf(" %d C2 ", (handle.preparing.commit2Used))
 					}
 					allMax = allMax + c2Max
@@ -142,10 +142,10 @@ func (m *Manager) WorkerStats() map[uuid.UUID]storiface.WorkerStats {
 					if p1Max > (handle.active.preCommit1Used + handle.preparing.preCommit1Used) {
 						p1Tasks = fmt.Sprintf(" %d P1 ", p1Max-(handle.active.preCommit1Used+handle.preparing.preCommit1Used))
 					}
-					if (handle.active.preCommit1Used) > 0{
+					if (handle.active.preCommit1Used) > 0 {
 						p1Running = fmt.Sprintf(" %d P1 ", (handle.active.preCommit1Used))
 					}
-					if (handle.preparing.preCommit1Used) > 0{
+					if (handle.preparing.preCommit1Used) > 0 {
 						p1Preparing = fmt.Sprintf(" %d P1 ", (handle.preparing.preCommit1Used))
 					}
 					allMax = allMax + p1Max

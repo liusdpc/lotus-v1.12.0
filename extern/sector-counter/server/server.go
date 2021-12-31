@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	pb "github.com/filguard/sector-counter/proto"
+	pb "github.com/liusdpc/my-sector-counter/proto"
 
 	"google.golang.org/grpc"
 )

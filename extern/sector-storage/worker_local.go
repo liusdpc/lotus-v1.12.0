@@ -34,8 +34,8 @@ import (
 var pathTypes = []storiface.SectorFileType{storiface.FTUnsealed, storiface.FTSealed, storiface.FTCache}
 
 type WorkerConfig struct {
-	TaskTypes []sealtasks.TaskType
-	NoSwap    bool
+	TaskTypes          []sealtasks.TaskType
+	NoSwap             bool
 	PreCommit1Max      uint64
 	PreCommit2Max      uint64
 	Commit2Max         uint64
@@ -600,7 +600,7 @@ func (l *LocalWorker) Paths(ctx context.Context) ([]stores.StoragePath, error) {
 	return l.localStore.Local(ctx)
 }
 
-func (l *LocalWorker) localDiskUsed() ( uint64, uint64) {
+func (l *LocalWorker) localDiskUsed() (uint64, uint64) {
 	var cacheCount = uint64(0)
 	var apCount = uint64(0)
 	var out []stores.StoragePath
@@ -696,7 +696,7 @@ func (l *LocalWorker) Info(context.Context) (storiface.WorkerInfo, error) {
 					allowP2C2Parallel = meta.AllowP2C2Parallel
 					autoPledgeDiff = meta.AutoPledgeDiff
 					ignoreOutOfSpace = meta.IgnoreOutOfSpace
-					if (meta.WorkerName != "") {
+					if meta.WorkerName != "" {
 						hostname = meta.WorkerName
 					}
 				}
@@ -780,7 +780,7 @@ func (l *LocalWorker) Info(context.Context) (storiface.WorkerInfo, error) {
 			AutoPledgeDiff:     autoPledgeDiff,
 			DiskUsed:           diskUsed,
 			APDiskUsed:         apDiskUsed,
-			IgnoreOutOfSpace:	ignoreOutOfSpace,
+			IgnoreOutOfSpace:   ignoreOutOfSpace,
 		},
 	}, nil
 }

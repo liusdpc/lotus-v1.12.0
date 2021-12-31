@@ -302,8 +302,8 @@ func (sw *schedWorker) workerCompactWindows() {
 
 				moved = append(moved, ti)
 				lower.todo = append(lower.todo, todo)
-				lower.allocated.add(sw.sched.allowMyScheduler,todo.taskType, worker.info.Resources, needRes)
-				window.allocated.free(sw.sched.allowMyScheduler,todo.taskType, worker.info.Resources, needRes)
+				lower.allocated.add(sw.sched.allowMyScheduler, todo.taskType, worker.info.Resources, needRes)
+				window.allocated.free(sw.sched.allowMyScheduler, todo.taskType, worker.info.Resources, needRes)
 			}
 
 			if len(moved) > 0 {
@@ -403,7 +403,7 @@ func (sw *schedWorker) startProcessingTask(taskDone chan struct{}, req *workerRe
 
 		if err != nil {
 			w.lk.Lock()
-			w.preparing.free(sh.allowMyScheduler,req.taskType, w.info.Resources, needRes)
+			w.preparing.free(sh.allowMyScheduler, req.taskType, w.info.Resources, needRes)
 			w.lk.Unlock()
 			sh.workersLk.Unlock()
 

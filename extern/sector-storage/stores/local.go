@@ -130,7 +130,7 @@ func (p *path) stat(ls LocalStorage) (fsutil.FsStat, error) {
 	if errIgnore == nil {
 		var meta MySchedulerMeta
 		if errIgnore := json.Unmarshal(mb, &meta); errIgnore == nil {
-			if meta.IgnoreOutOfSpace{
+			if meta.IgnoreOutOfSpace {
 				stat.Available = int64(^uint(0) >> 1)
 				return stat, err
 			}

@@ -125,6 +125,11 @@ USAGE:
    lotus-miner run [command options] [arguments...]
 
 OPTIONS:
+   --window-post         enable window PoSt (default: true)
+   --winning-post        enable winning PoSt (default: true)
+   --p2p                 enable P2P (default: true)
+   --sctype value        sector counter type(alloce,get)
+   --sclisten value      host address and port the sector counter will listen on
    --miner-api value     2345
    --enable-gpu-proving  enable use of GPU for mining operations (default: true)
    --nosync              don't check full-node sync status (default: false)
@@ -1492,6 +1497,8 @@ COMMANDS:
    expired            Get or cleanup expired sectors
    renew              Renew expiring sectors while not exceeding each sector's max life
    extend             Extend sector expiration
+   mypledge           store random data in a sector for all AddPieceMax
+   mypledgeonce       store random data in a sector for once AddPieceMax
    terminate          Terminate sector on-chain then remove (WARNING: This means losing power and collateral for the removed sector)
    remove             Forcefully remove a sector (WARNING: This means losing power and collateral for the removed sector (use 'terminate' for lower penalty))
    mark-for-upgrade   Mark a committed capacity sector for replacement by a sector with deals
@@ -1651,6 +1658,32 @@ OPTIONS:
    --expiration-cutoff value  when extending v1 sectors, skip sectors whose current expiration is more than <cutoff> epochs from now (infinity if unspecified) (default: 0)
                               
    --help, -h                 show help (default: false)
+   
+```
+
+### lotus-miner sectors mypledge
+```
+NAME:
+   lotus-miner sectors mypledge - store random data in a sector for all AddPieceMax
+
+USAGE:
+   lotus-miner sectors mypledge [command options] [arguments...]
+
+OPTIONS:
+   --help, -h  show help (default: false)
+   
+```
+
+### lotus-miner sectors mypledgeonce
+```
+NAME:
+   lotus-miner sectors mypledgeonce - store random data in a sector for once AddPieceMax
+
+USAGE:
+   lotus-miner sectors mypledgeonce [command options] [arguments...]
+
+OPTIONS:
+   --help, -h  show help (default: false)
    
 ```
 

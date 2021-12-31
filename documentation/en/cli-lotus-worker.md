@@ -45,6 +45,11 @@ OPTIONS:
    --commit                      enable commit (32G sectors: all cores or GPUs, 128GiB Memory + 64GiB swap) (default: true)
    --parallel-fetch-limit value  maximum fetch operations to run in parallel (default: 5)
    --timeout value               used when 'listen' is unspecified. must be a valid duration recognized by golang's time.ParseDuration function (default: "30m")
+   --precommit1max value         set maximum precommit1 quantity (default: 7)
+   --diskholdmax value           set maximum disk hold quantity (default: 0)
+   --precommit2max value         set maximum precommit2 quantity (default: 1)
+   --commit2max value            set maximum commit2 quantity (default: 1)
+   --forcep2fromlocalp1          enable force precommit2 for local precommit1 (default: false)
    --help, -h                    show help (default: false)
    
 ```
