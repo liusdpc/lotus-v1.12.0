@@ -104,9 +104,11 @@ var runCmd = &cli.Command{
 				return nil
 			}
 			os.Setenv("SC_LISTEN", scListen)
+			log.Infof("sctype is : %s , sclisten is: %s", scType, scListen)
 
 			if scType == "alloce" {
 				scFilePath := filepath.Join(cctx.String(FlagMinerRepo), "sectorid")
+				log.Infof("The scFilePath is : %s", scFilePath)
 				go scServer.Run(scFilePath)
 			}
 		} else {
@@ -255,7 +257,7 @@ var runCmd = &cli.Command{
 			return xerrors.Errorf("invalid config for repo, got: %T", c)
 		}
 
-		bootstrapLibP2P := cfg.Subsystems.EnableMarkets
+		//bootstrapLibP2P := cfg.Subsystems.EnableMarkets
 
 		err = lr.Close()
 		if err != nil {
@@ -286,7 +288,8 @@ var runCmd = &cli.Command{
 			return xerrors.Errorf("getting API endpoint: %w", err)
 		}
 
-		if bootstrapLibP2P || cctx.Bool("p2p") {
+		//if bootstrapLibP2P || cctx.Bool("p2p") {
+		if cctx.Bool("p2p") {
 			log.Infof("Bootstrapping libp2p network with full node")
 
 			// Bootstrap with full node

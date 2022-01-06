@@ -44,6 +44,7 @@ func (s *Service) WriteSectorID() {
 
 func readFileSid(filePath string) (uint64, error) {
 	if _, err := os.Stat(filePath); err != nil { // 文件不存在
+		log.Println("The sectorid file is not exist")
 		f, err := os.Create(filePath)
 		if err != nil {
 			return 0, err
@@ -77,6 +78,7 @@ func readFileSid(filePath string) (uint64, error) {
 // Run ..
 func Run(scFilePath string) {
 	rpcAddr, ok := os.LookupEnv("SC_LISTEN")
+	log.Println("SC_LISTEN: %s", rpcAddr)
 	if !ok {
 		log.Println("NO SC_LISTEN ENV")
 		return
